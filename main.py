@@ -29,12 +29,12 @@ with inputs:
     SeniorCitizen = st.selectbox("Is he Senior Citizen", sorted(choice))
     MonthlyCharges = st.text_input("Monthly Charges", "Type Here")
     TotalCharges = st.text_input("Total Charges", "Type Here")
-    tenure = st.text_input("Total tenure", "Type Here")
+    Tenure = st.text_input("Total tenure", "Type Here")
     Gender = st.selectbox("Gender", sorted(gender))
     Partner = st.selectbox("Does he have a partner", sorted(choice))
     Dependents = st.selectbox("Does he have a Dependents", sorted(choice))
-    phoneService = st.selectbox("Does he avail phone service", sorted(choice))
-    multipleLines = st.selectbox(
+    PhoneService = st.selectbox("Does he avail phone service", sorted(choice))
+    MultipleLines = st.selectbox(
         "Does he have multiple lines", sorted(multiple_lines))
     InternetService = st.selectbox(
         "Does he have internet service", sorted(internet_service))
@@ -53,49 +53,55 @@ with inputs:
         "Does he payment on Paperless Bill", sorted(choice))
     PaymentMethod = st.selectbox("Payment Method", sorted(paymentMethod))
 
-data = [[SeniorCitizen, MonthlyCharges, TotalCharges, tenure, Gender, Partner, Dependents, phoneService, multipleLines, InternetService,
+data = [[SeniorCitizen, MonthlyCharges, TotalCharges, Tenure, Gender, Partner, Dependents, PhoneService, MultipleLines, InternetService,
     OnlineSecurity, OnlineBackup, DeviceProtection, TechSupport, StreamingTV, StreamingMovies, Contract, PaperlessBilling, PaymentMethod]]
 
-input_df = pd.DataFrame(data, columns=[ 'gender', 'SeniorCitizen', 'Partner', 'Dependents',
-                                       'tenure', 'PhoneService', 'MultipleLines', 'InternetService',
+st.write(df1)
+
+input_df = pd.DataFrame(data, columns=[ 'SeniorCitizen','MonthlyCharges', 'TotalCharges','Tenure','Gender', 'Partner', 'Dependents',
+                                       'PhoneService', 'MultipleLines', 'InternetService',
                                        'OnlineSecurity', 'OnlineBackup', 'DeviceProtection', 'TechSupport',
                                        'StreamingTV', 'StreamingMovies', 'Contract', 'PaperlessBilling',
-                                       'PaymentMethod', 'MonthlyCharges', 'TotalCharges'])
+                                       'PaymentMethod', ])
 
 
-df_2 = pd.concat([df1, input_df], ignore_index=True)
- # Group the tenure in bins of 12 months
-
-df_2.dropna(inplace=True)
+# st.write(input_df)
+# df_2 = pd.concat([df1, input_df], ignore_index=True)
+ 
+# st.write(df_2)
+# Group the tenure in bins of 12 months
+# df_2.dropna(inplace=True)
+input_df.dropna(inplace=True)
 labels = [f"{i}-{i+12}" for i in range(0, 72, 12)]
 
-df_2['tenure_grp'] = pd.cut(df_2.tenure.astype(
+input_df['tenure_grp'] = pd.cut(input_df.Tenure.astype(
     int), range(0, 80, 12), right=False, labels=labels)
 
 # drop column customerID and tenure
-df_2.drop(columns=['tenure'], axis=1, inplace=True)
+input_df.drop(columns=['Tenure'], axis=1, inplace=True)
 
+st.write(input_df)
 
-new_df__dummies = pd.get_dummies(df_2,columns=[['gender', 'SeniorCitizen', 'Partner', 'Dependents', 'PhoneService',
+new_df__dummies = pd.get_dummies(input_df,drop_first=True,columns=['Gender', 'SeniorCitizen', 'Partner', 'Dependents', 'PhoneService',
                                        'MultipleLines', 'InternetService', 'OnlineSecurity', 'OnlineBackup',
                                        'DeviceProtection', 'TechSupport', 'StreamingTV', 'StreamingMovies',
-                                       'Contract', 'PaperlessBilling', 'PaymentMethod', 'tenure_grp']],drop_first=True)
+                                       'Contract', 'PaperlessBilling', 'PaymentMethod', 'tenure_grp'])
 
-# st.write(new_df__dummies)
+st.write(new_df__dummies)
 
-# single = model.predict(new_df__dummies.tail(1))
-# probablity = model.predict_proba(new_df__dummies.tail(1))[:, 1]
+# single = model.predict(df1.tail(1))
+# probablity = model.predict_proba(df1.tail(1))[:, 1]
 
-st.table(new_df__dummies)
-# result = model.predict_proba(input_df)
+# st.table(df1)
+result = model.predict_proba(input_df)
 
-# if result == 1:
-#         o1 = "This customer is likely to be churned!!"
-#         o2 = "Confidence: {}".format(result*100)
-# else:
-#         o1 = "This customer is likely to continue!!"
-#         o2 = "Confidence: {}".format(result*100)
+if result == 1:
+        o1 = "This customer is likely to be churned!!"
+        o2 = "Confidence: {}".format(result*100)
+else:
+        o1 = "This customer is likely to continue!!"
+        o2 = "Confidence: {}".format(result*100)
 
 
-# st.header(o1)
-# st.header(o2)
+st.header(o1)
+st.header(o2)
